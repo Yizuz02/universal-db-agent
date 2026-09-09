@@ -157,8 +157,9 @@ class UniversalDBAgent:
 
         # Resolve paths
         project_root = Path(__file__).resolve().parent.parent.parent
-        resolved_db_path = Path(db_path) if db_path else project_root / "construction_company.db"
-        resolved_reports_dir = Path(reports_dir) if reports_dir else project_root / "reports"
+        data_dir = os.environ.get('DATA_DIR')
+        resolved_db_path = Path(db_path) if db_path else (Path(data_dir) / "construction_company.db" if data_dir else project_root / "construction_company.db")
+        resolved_reports_dir = Path(reports_dir) if reports_dir else (Path(data_dir) / "reports" if data_dir else project_root / "reports")
 
         resolved_metadata_path = Path(metadata_path) if metadata_path else project_root / "backend" / "chat" / "metadata.json"
 

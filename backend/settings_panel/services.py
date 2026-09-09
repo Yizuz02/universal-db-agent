@@ -2,7 +2,11 @@ import os
 import sqlite3
 import json
 
-CONFIG_DIR = "storage/config"
+_data_dir = os.environ.get('DATA_DIR')
+if _data_dir:
+    CONFIG_DIR = os.path.join(_data_dir, "storage", "config")
+else:
+    CONFIG_DIR = "storage/config"
 METADATA_PATH = os.path.join(CONFIG_DIR, "metadata.json")
 
 def sync_database_schema_to_metadata(db_path: str) -> dict:

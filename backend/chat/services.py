@@ -58,7 +58,7 @@ def execute_agent_and_save_workflow(conversation, user_text):
         resolved_db_path = project_root / sys_config.target_db_path
     else:
         resolved_db_path = Path(sys_config.target_db_path)
-    resolved_reports_dir = project_root / "reports"
+    resolved_reports_dir = Path(os.environ['DATA_DIR']) / 'reports' if os.environ.get('DATA_DIR') else project_root / 'reports'
 
     collected_paths = []
 

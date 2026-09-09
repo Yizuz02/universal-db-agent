@@ -19,7 +19,11 @@ from .serializers import (
 )
 from .services import execute_agent_and_save_workflow
 
-REPORTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../reports/markdown"))
+_data_dir = os.environ.get('DATA_DIR')
+if _data_dir:
+    REPORTS_DIR = os.path.abspath(os.path.join(_data_dir, 'reports', 'markdown'))
+else:
+    REPORTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../reports/markdown"))
 
 
 class ConversationListView(APIView):
@@ -141,7 +145,10 @@ class ViewMarkdownReportView(APIView):
         raise Http404("Report file not found.")
 
 
-CSV_EXPORTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../reports/csv"))
+if _data_dir:
+    CSV_EXPORTS_DIR = os.path.abspath(os.path.join(_data_dir, 'reports', 'csv'))
+else:
+    CSV_EXPORTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../reports/csv"))
 
 
 class ViewCSVExportView(APIView):

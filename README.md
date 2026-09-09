@@ -133,6 +133,28 @@ Alternatively, manage credentials from the web UI (Settings → Models), where A
 - Database metadata (table/column descriptions used for prompting) lives in `backend/chat/metadata.json`.
 - The `.superpowers/` and `reports/`, `storage/` directories are workspace-local and gitignored.
 
+## Docker
+
+Prerequisites: Docker Engine (or rootless Podman with `podman-compose`) and Docker Compose.
+
+Optionally set `GEMINI_API_KEY` in a `.env` file (or your shell) to enable Google Gemini by default; otherwise the app falls back to Ollama.
+
+```bash
+docker compose up -d --build
+```
+
+- App (frontend): http://localhost:8080
+- Backend API / Django admin: http://localhost:8765 (admin at http://localhost:8765/admin/)
+
+Default admin: `admin` / `admin123` (override via `ADMIN_USERNAME` / `ADMIN_PASSWORD`).
+
+Data (Django DB, demo database, generated reports/exports) persists in the `udba_data` named volume.
+
+- `docker compose down` stops containers and keeps the volume.
+- `docker compose down -v` also deletes the volume (and all persisted data).
+
+> **Rootless Podman note:** on this machine, podman-compose's default *pod* mode can break nginx log files (EACCES). Use `podman-compose --in-pod false up -d --build` instead.
+
 ---
 
 Built with Python, Django, React, and LangChain.
