@@ -1,0 +1,72 @@
+{% for label, conversations in conversation_groups.items %}
+
+<div class="mb-6">
+
+    <h3
+        class="px-3 pb-2 text-xs font-semibold uppercase tracking-wider
+               text-text-muted dark:text-text-dark-muted">
+
+        {{ label }}
+
+    </h3>
+
+    {% for conversation in conversations %}
+
+    <a
+        href="{% url 'conversation' conversation.id %}"
+
+        class="mb-1 block rounded-xl
+               px-3 py-3
+
+               transition
+
+               hover:bg-page
+               dark:hover:bg-surface-elevated
+
+               {% if selected_conversation.id == conversation.id %}
+                    bg-page dark:bg-surface-elevated
+               {% endif %}">
+
+        <div
+            class="truncate font-medium
+                   text-text
+                   dark:text-text-dark">
+
+            {{ conversation.title }}
+
+        </div>
+
+        <div
+            class="mt-1 text-xs
+                   text-text-muted
+                   dark:text-text-dark-muted">
+
+            {{ conversation.updated_at|date:"H:i" }}
+
+        </div>
+
+    </a>
+
+    {% endfor %}
+
+</div>
+
+{% empty %}
+
+<div
+    class="mt-12 px-6 text-center
+           text-sm
+           text-text-muted
+           dark:text-text-dark-muted">
+
+    No conversations yet.
+
+    <div class="mt-2">
+
+        Start your first conversation using the button above.
+
+    </div>
+
+</div>
+
+{% endfor %}

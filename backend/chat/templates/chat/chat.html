@@ -1,0 +1,917 @@
+{% extends "chat/base.html" %}
+
+{% block title %}
+Universal DB Agent
+{% endblock %}
+
+{% block content %}
+
+<div class="flex h-screen bg-page dark:bg-page-dark">
+
+    {% include "chat/components/sidebar.html" %}
+
+    <main class="flex flex-1 flex-col">
+
+        {% include "chat/components/chat_header.html" %}
+
+        {% include "chat/components/chat_messages.html" %}
+
+        {% include "chat/components/chat_input.html" %}
+
+    </main>
+
+</div>
+
+{% include "chat/components/settings_modal.html" %}
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+
+marked.setOptions({
+    breaks: true,
+    gfm: true,
+});
+
+const conversationId = {{ selected_conversation.id|default:"null" }};
+
+const form = document.getElementById("chat-form");
+const textarea = document.getElementById("chat-input");
+const messages = document.getElementById("messages-container");
+const sendButton = document.getElementById("send-button");
+
+function resizeTextarea() {
+
+    textarea.style.height = "auto";
+
+    const maxHeight = 180;
+
+    textarea.style.height =
+        Math.min(textarea.scrollHeight, maxHeight) + "px";
+
+}
+
+textarea.addEventListener("input", resizeTextarea);
+
+resizeTextarea();
+
+textarea.addEventListener("keydown", function(e) {
+
+    if (e.key === "Enter" && !e.shiftKey) {
+
+        e.preventDefault();
+
+        this.form.requestSubmit();
+
+    }
+
+});
+
+const csrfToken = document.querySelector(
+    "[name=csrfmiddlewaretoken]"
+).value;
+
+function scrollToBottom() {
+
+    messages.scrollTop = messages.scrollHeight;
+
+}
+
+function renderMarkdown(element, content) {
+
+    element.innerHTML = marked.parse(content);
+
+}
+
+document.querySelectorAll(".message-content").forEach(element => {
+
+    renderMarkdown(
+        element,
+        element.textContent
+    );
+
+});
+
+function appendMessage(role, content) {
+
+    const wrapper = document.createElement("div");
+
+    wrapper.className =
+        role === "user"
+        ? "mb-6 flex justify-end"
+        : "mb-6 flex justify-start";
+
+
+    const bubble = document.createElement("div");
+
+    bubble.className =
+        role === "user"
+        ?
+        "max-w-3xl rounded-2xl bg-primary px-5 py-4 text-primary-foreground"
+        :
+        "max-w-3xl rounded-2xl border border-border dark:border-border-dark \
+         bg-surface dark:bg-surface-elevated \
+         px-5 py-4 text-text dark:text-text-dark prose \
+         dark:prose-invert max-w-none prose-p:my-4 prose-headings:mt-6 prose-headings:mb-3 \
+         prose-ul:my-4 prose-ol:my-4 prose-li:my-1 prose-pre:my-4";
+
+
+    if (role === "agent") {
+
+        renderMarkdown(bubble, content);
+
+    } else {
+
+        bubble.textContent = content;
+
+    }
+
+
+    wrapper.appendChild(bubble);
+
+    messages.appendChild(wrapper);
+
+    scrollToBottom();
+
+    return bubble;
+
+}
+
+
+form.addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    const content = textarea.value.trim();
+
+    if(content === "")
+        return;
+
+
+    if(conversationId === null){
+
+        alert("No conversation selected.");
+
+        return;
+
+    }
+
+
+    appendMessage("user", content);
+
+
+    textarea.value = "";
+
+    resizeTextarea();
+
+
+    sendButton.disabled = true;
+
+
+    const thinkingBubble = appendMessage(
+        "agent",
+        "Thinking..."
+    );
+
+
+    try {
+
+        const response = await fetch(
+
+            `/api/conversations/${conversationId}/messages/`,
+
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+
+                body: JSON.stringify({
+                    content: content
+                })
+            }
+
+        );
+
+
+        const data = await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error || "Unknown error"
+            );
+
+        }
+
+
+        // Reemplaza Thinking... por la respuesta Markdown
+        renderMarkdown(
+            thinkingBubble,
+            data.agent_response
+        );
+
+
+    }
+
+    catch(error){
+
+        thinkingBubble.textContent =
+            "Error: " + error.message;
+
+    }
+
+
+    finally{
+
+        sendButton.disabled = false;
+
+    }
+
+    
+});
+
+</script>
+
+<script>
+// ==================== SETTINGS MODAL ====================
+
+const settingsModal = document.getElementById("settings-modal");
+const settingsButton = document.getElementById("settings-button");
+const settingsClose = document.getElementById("settings-close");
+const settingsCsrf = typeof csrfToken !== "undefined" ? csrfToken : document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+
+// --- Tabs ---
+const tabBtns = document.querySelectorAll(".settings-tab");
+const panels = {
+    appearance: document.getElementById("panel-appearance"),
+    general: document.getElementById("panel-general"),
+    llm: document.getElementById("panel-llm"),
+    database: document.getElementById("panel-database"),
+};
+
+tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const tab = btn.dataset.tab;
+        // Update tab buttons
+        tabBtns.forEach(b => {
+            const isActive = b.dataset.tab === tab;
+            b.classList.toggle("bg-primary", isActive);
+            b.classList.toggle("text-primary-foreground", isActive);
+            b.classList.toggle("bg-page", !isActive);
+            b.classList.toggle("dark:bg-surface-elevated", !isActive);
+            b.classList.toggle("text-text", !isActive);
+            b.classList.toggle("dark:text-text-dark", !isActive);
+        });
+        // Show/hide panels
+        Object.entries(panels).forEach(([key, panel]) => {
+            panel.classList.toggle("hidden", key !== tab);
+        });
+    });
+});
+
+// ==================== I18N ====================
+
+const I18N = {
+    en: {
+        "settings.title": "Settings",
+        "tab.general": "General",
+        "tab.appearance": "Appearance",
+        "tab.llm": "LLM",
+        "tab.database": "Database",
+        "general.heading": "General",
+        "general.language": "Language",
+        "general.timezone": "Timezone",
+        "appearance.heading": "Appearance",
+        "appearance.theme": "Theme",
+        "appearance.font_size": "Font Size",
+        "appearance.font_family": "Font Family",
+        "llm.heading": "LLM",
+        "llm.provider": "Provider",
+        "llm.model": "Model",
+        "llm.temperature": "Temperature",
+        "llm.context_window": "Context Window",
+        "llm.coming_soon": "Coming soon.",
+        "db.heading": "Database",
+        "db.path": "Database Path",
+        "db.status": "Status",
+        "db.connected": "Connected",
+        "db.coming_soon": "Coming soon.",
+        "sidebar.new_conversation": "+ New Conversation",
+        "sidebar.search": "Search conversations...",
+        "sidebar.settings": "Settings",
+        "sidebar.app_title": "Universal DB Agent",
+        "header.new_chat": "New Conversation",
+        "chat_input.placeholder": "Ask anything about your database...",
+        "chat.empty_subtitle": "Ask questions about your database, generate reports, inspect schemas and obtain insights using natural language.",
+        "login.title": "Universal DB Agent",
+        "login.subtitle": "Interact with your databases using natural language, generate reports and inspect information through AI.",
+        "login.welcome": "Welcome Back",
+        "login.sign_in_prompt": "Sign in to continue.",
+        "login.username": "Username",
+        "login.password": "Password",
+        "login.sign_in": "Sign In",
+        "general.language_label": "Language",
+    },
+    es: {
+        "settings.title": "Configuración",
+        "tab.general": "General",
+        "tab.appearance": "Apariencia",
+        "tab.llm": "LLM",
+        "tab.database": "Base de Datos",
+        "general.heading": "General",
+        "general.language": "Idioma",
+        "general.timezone": "Zona horaria",
+        "appearance.heading": "Apariencia",
+        "appearance.theme": "Tema",
+        "appearance.font_size": "Tamaño de letra",
+        "appearance.font_family": "Fuente",
+        "llm.heading": "LLM",
+        "llm.provider": "Proveedor",
+        "llm.model": "Modelo",
+        "llm.temperature": "Temperatura",
+        "llm.context_window": "Ventana de contexto",
+        "llm.coming_soon": "Próximamente.",
+        "db.heading": "Base de Datos",
+        "db.path": "Ruta de la base de datos",
+        "db.status": "Estado",
+        "db.connected": "Conectado",
+        "db.coming_soon": "Próximamente.",
+        "sidebar.new_conversation": "+ Nueva Conversación",
+        "sidebar.search": "Buscar conversaciones...",
+        "sidebar.settings": "Configuración",
+        "sidebar.app_title": "Universal DB Agent",
+        "header.new_chat": "Nueva Conversación",
+        "chat_input.placeholder": "Pregunta lo que sea sobre tu base de datos...",
+        "chat.empty_subtitle": "Haz preguntas sobre tu base de datos, genera reportes, inspecciona esquemas y obtén información usando lenguaje natural.",
+        "login.title": "Universal DB Agent",
+        "login.subtitle": "Interactúa con tus bases de datos usando lenguaje natural, genera reportes e inspecciona información a través de IA.",
+        "login.welcome": "Bienvenido",
+        "login.sign_in_prompt": "Inicia sesión para continuar.",
+        "login.username": "Usuario",
+        "login.password": "Contraseña",
+        "login.sign_in": "Iniciar Sesión",
+        "general.language_label": "Idioma",
+    },
+    zh: {
+        "settings.title": "设置",
+        "tab.general": "通用",
+        "tab.appearance": "外观",
+        "tab.llm": "LLM",
+        "tab.database": "数据库",
+        "general.heading": "通用",
+        "general.language": "语言",
+        "general.timezone": "时区",
+        "appearance.heading": "外观",
+        "appearance.theme": "主题",
+        "appearance.font_size": "字体大小",
+        "appearance.font_family": "字体",
+        "llm.heading": "LLM",
+        "llm.provider": "提供商",
+        "llm.model": "模型",
+        "llm.temperature": "温度",
+        "llm.context_window": "上下文窗口",
+        "llm.coming_soon": "即将推出。",
+        "db.heading": "数据库",
+        "db.path": "数据库路径",
+        "db.status": "状态",
+        "db.connected": "已连接",
+        "db.coming_soon": "即将推出。",
+        "sidebar.new_conversation": "+ 新对话",
+        "sidebar.search": "搜索对话...",
+        "sidebar.settings": "设置",
+        "sidebar.app_title": "通用数据库代理",
+        "header.new_chat": "新对话",
+        "chat_input.placeholder": "询问有关您数据库的任何问题...",
+        "chat.empty_subtitle": "查询您的数据库，生成报告，检查架构并使用自然语言获取洞察。",
+        "login.title": "通用数据库代理",
+        "login.subtitle": "使用自然语言与数据库交互，生成报告并通过AI检查信息。",
+        "login.welcome": "欢迎回来",
+        "login.sign_in_prompt": "登录以继续。",
+        "login.username": "用户名",
+        "login.password": "密码",
+        "login.sign_in": "登录",
+        "general.language_label": "语言",
+    },
+    pt: {
+        "settings.title": "Configurações",
+        "tab.general": "Geral",
+        "tab.appearance": "Aparência",
+        "tab.llm": "LLM",
+        "tab.database": "Banco de Dados",
+        "general.heading": "Geral",
+        "general.language": "Idioma",
+        "general.timezone": "Fuso Horário",
+        "appearance.heading": "Aparência",
+        "appearance.theme": "Tema",
+        "appearance.font_size": "Tamanho da Fonte",
+        "appearance.font_family": "Fonte",
+        "llm.heading": "LLM",
+        "llm.provider": "Provedor",
+        "llm.model": "Modelo",
+        "llm.temperature": "Temperatura",
+        "llm.context_window": "Janela de Contexto",
+        "llm.coming_soon": "Em breve.",
+        "db.heading": "Banco de Dados",
+        "db.path": "Caminho do Banco",
+        "db.status": "Status",
+        "db.connected": "Conectado",
+        "db.coming_soon": "Em breve.",
+        "sidebar.new_conversation": "+ Nova Conversa",
+        "sidebar.search": "Pesquisar conversas...",
+        "sidebar.settings": "Configurações",
+        "sidebar.app_title": "Universal DB Agent",
+        "header.new_chat": "Nova Conversa",
+        "chat_input.placeholder": "Pergunte qualquer coisa sobre seu banco de dados...",
+        "chat.empty_subtitle": "Faça perguntas sobre seu banco de dados, gere relatórios, inspecione esquemas e obtenha insights usando linguagem natural.",
+        "login.title": "Universal DB Agent",
+        "login.subtitle": "Interaja com seus bancos de dados usando linguagem natural, gere relatórios e inspecione informações através de IA.",
+        "login.welcome": "Bem-vindo de Volta",
+        "login.sign_in_prompt": "Faça login para continuar.",
+        "login.username": "Usuário",
+        "login.password": "Senha",
+        "login.sign_in": "Entrar",
+        "general.language_label": "Idioma",
+    },
+};
+
+function applyLanguage(lang) {
+    const dict = I18N[lang] || I18N.en;
+    // Update all data-i18n elements
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key] !== undefined) {
+            if (el.placeholder !== undefined && el.tagName === "INPUT" && el.type === "text") {
+                el.placeholder = dict[key];
+            } else if (el.placeholder !== undefined && el.tagName === "TEXTAREA") {
+                el.placeholder = dict[key];
+            } else if (el.tagName === "SELECT") {
+                // skip select elements
+            } else {
+                el.textContent = dict[key];
+            }
+        }
+    });
+    // Update document lang
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : lang === "pt" ? "pt-BR" : lang;
+}
+
+// Load translations for login page too (runs after login.js which has its own inline script)
+document.addEventListener("DOMContentLoaded", () => {
+    const cached = localStorage.getItem("preferences");
+    if (cached) {
+        try {
+            const prefs = JSON.parse(cached);
+            if (prefs.language) applyLanguage(prefs.language);
+        } catch {}
+    }
+});
+
+// --- Theme helpers ---
+const themeBtns = document.querySelectorAll(".theme-btn");
+
+function setActiveThemeBtn(themeName) {
+    themeBtns.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.theme === themeName);
+    });
+}
+
+function applyTheme(themeName) {
+    document.documentElement.dataset.theme = themeName;
+}
+
+// --- Font size helpers ---
+const sizeBtns = document.querySelectorAll(".size-btn");
+
+function setActiveSizeBtn(size) {
+    sizeBtns.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.size === size);
+    });
+}
+
+function applyFontSize(size) {
+    document.documentElement.style.fontSize = size;
+    document.documentElement.dataset.fontSize = size;
+}
+
+// --- Font family helpers ---
+const familyBtns = document.querySelectorAll(".family-btn");
+
+function setActiveFamilyBtn(family) {
+    familyBtns.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.family === family);
+    });
+}
+
+function applyFontFamily(family) {
+    document.documentElement.dataset.fontFamily = family;
+}
+
+// --- Language helpers ---
+const langBtns = document.querySelectorAll(".lang-btn");
+
+function setActiveLangBtn(lang) {
+    langBtns.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === lang);
+    });
+}
+
+// --- Load all preferences ---
+async function loadPreferences() {
+    const cached = localStorage.getItem("preferences");
+    if (cached) {
+        try {
+            const prefs = JSON.parse(cached);
+            applyAll(prefs);
+        } catch {}
+    }
+
+    try {
+        const resp = await fetch("/settings/api/preferences/", {
+            headers: { "X-CSRFToken": settingsCsrf },
+        });
+        if (resp.ok) {
+            const data = await resp.json();
+            const prefs = {
+                theme: data.theme || "light",
+                font_size: data.font_size || "16px",
+                font_family: data.font_family || "system",
+                language: data.language || "en",
+                timezone: data.timezone || "America/Mexico_City",
+            };
+            localStorage.setItem("preferences", JSON.stringify(prefs));
+            applyAll(prefs);
+        }
+    } catch {
+        // keep cached
+    }
+}
+
+function applyAll(prefs) {
+    applyTheme(prefs.theme);
+    setActiveThemeBtn(prefs.theme);
+    applyFontSize(prefs.font_size);
+    setActiveSizeBtn(prefs.font_size);
+    applyFontFamily(prefs.font_family);
+    setActiveFamilyBtn(prefs.font_family);
+    applyLanguage(prefs.language);
+    setActiveLangBtn(prefs.language);
+    const tzSelect = document.getElementById("timezone-select");
+    if (tzSelect) tzSelect.value = prefs.timezone;
+}
+
+// --- Save all preferences ---
+async function savePreferences(updates) {
+    // Read current prefs from localStorage, merge updates
+    let prefs = { theme: "light", font_size: "16px", font_family: "system", language: "en", timezone: "America/Mexico_City" };
+    try {
+        const cached = localStorage.getItem("preferences");
+        if (cached) prefs = { ...prefs, ...JSON.parse(cached) };
+    } catch {}
+    prefs = { ...prefs, ...updates };
+
+    localStorage.setItem("preferences", JSON.stringify(prefs));
+    applyAll(prefs);
+
+    try {
+        await fetch("/settings/api/preferences/", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": settingsCsrf,
+            },
+            body: JSON.stringify(prefs),
+        });
+    } catch {
+        // Silent fail
+    }
+}
+
+// --- Modal open/close ---
+settingsButton.addEventListener("click", () => {
+    settingsModal.classList.remove("hidden");
+    settingsModal.classList.add("flex");
+});
+
+settingsClose.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+    settingsModal.classList.remove("flex");
+});
+
+settingsModal.addEventListener("click", (e) => {
+    if (e.target === settingsModal) {
+        settingsModal.classList.add("hidden");
+        settingsModal.classList.remove("flex");
+    }
+});
+
+// --- Theme button clicks ---
+themeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        savePreferences({ theme: btn.dataset.theme });
+    });
+});
+
+// --- Font size button clicks ---
+sizeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        savePreferences({ font_size: btn.dataset.size });
+    });
+});
+
+// --- Font family button clicks ---
+familyBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        savePreferences({ font_family: btn.dataset.family });
+    });
+});
+
+// --- Language button clicks ---
+langBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        savePreferences({ language: btn.dataset.lang });
+    });
+});
+
+// --- Timezone change ---
+const tzSelect = document.getElementById("timezone-select");
+if (tzSelect) {
+    tzSelect.addEventListener("change", () => {
+        savePreferences({ timezone: tzSelect.value });
+    });
+}
+
+// --- Init on page load ---
+document.addEventListener("DOMContentLoaded", loadPreferences);
+
+// ==================== LLM CREDENTIAL MANAGEMENT ====================
+
+let providerModels = {};
+let editingCredentialId = null;
+
+const llmTabBtn = document.querySelector('[data-tab="llm"]');
+const credentialsContainer = document.getElementById("credentials-container");
+const credentialForm = document.getElementById("credential-form");
+const newCredBtn = document.getElementById("new-credential-btn");
+const formCancel = document.getElementById("credential-form-cancel");
+const formTitle = document.getElementById("credential-form-title");
+const saveBtn = document.getElementById("credential-save-btn");
+
+const credProvider = document.getElementById("cred-provider");
+const credModel = document.getElementById("cred-model");
+const credName = document.getElementById("cred-name");
+const credApiKey = document.getElementById("cred-api-key");
+const credBaseUrl = document.getElementById("cred-base-url");
+const credBaseUrlGroup = document.getElementById("cred-base-url-group");
+const credApiKeyGroup = document.getElementById("cred-api-key-group");
+const credTemp = document.getElementById("cred-temp");
+const credMaxTokens = document.getElementById("cred-max-tokens");
+const credGroup = document.getElementById("cred-group");
+const scopeRadios = document.querySelectorAll('input[name="cred-scope"]');
+
+// Load provider options
+let providerOptionsCache = null;
+async function loadProviderOptions() {
+    if (providerOptionsCache) return providerOptionsCache;
+    try {
+        const resp = await fetch("/settings/api/credentials/options/", {
+            headers: { "X-CSRFToken": settingsCsrf },
+        });
+        if (resp.ok) {
+            providerOptionsCache = await resp.json();
+            return providerOptionsCache;
+        }
+    } catch {}
+    return { providers: [], groups: [] };
+}
+
+function updateModelDropdown(providerId) {
+    const opts = providerOptionsCache?.providers || [];
+    const prov = opts.find(p => p.id === providerId);
+    credModel.innerHTML = "";
+    if (prov) {
+        prov.models.forEach(m => {
+            const opt = document.createElement("option");
+            opt.value = m;
+            opt.textContent = m;
+            credModel.appendChild(opt);
+        });
+        // Base URL: only for Ollama
+        credBaseUrlGroup.classList.toggle("hidden", !prov.has_base_url);
+        // API Key: hide for Ollama
+        credApiKeyGroup.classList.toggle("hidden", !prov.has_api_key);
+        // Default Base URL for Ollama
+        if (prov.default_base_url) {
+            credBaseUrl.value = prov.default_base_url;
+        } else {
+            credBaseUrl.value = "";
+        }
+    }
+}
+
+// Load credentials list
+async function loadCredentials() {
+    let activeId = null;
+    try {
+        const prefResp = await fetch("/settings/api/preferences/", {
+            headers: { "X-CSRFToken": settingsCsrf },
+        });
+        if (prefResp.ok) {
+            const prefs = await prefResp.json();
+            activeId = prefs.active_credential;
+        }
+    } catch {}
+
+    try {
+        const resp = await fetch("/settings/api/credentials/", {
+            headers: { "X-CSRFToken": settingsCsrf },
+        });
+        if (!resp.ok) return;
+        const creds = await resp.json();
+        creds.forEach(c => c.is_active = c.id === activeId);
+        renderCredentials(creds);
+    } catch {}
+}
+
+function renderCredentials(creds) {
+    if (!creds || creds.length === 0) {
+        credentialsContainer.innerHTML = '<p class="text-xs text-text-muted dark:text-text-dark-muted text-center py-4">No credentials saved yet.</p>';
+        return;
+    }
+    credentialsContainer.innerHTML = "";
+    creds.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "flex items-center justify-between rounded-lg border border-border dark:border-border-dark p-3";
+        div.innerHTML = `
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium text-text dark:text-text-dark truncate">${c.name}</span>
+                    <span class="rounded-full bg-page dark:bg-surface-elevated px-2 py-0.5 text-xs text-text-muted dark:text-text-dark-muted">${c.provider_type}</span>
+                    <span class="text-xs text-text-muted dark:text-text-dark-muted">${c.scope === "personal" ? "🔒" : "👥"}</span>
+                </div>
+                <p class="text-xs text-text-muted dark:text-text-dark-muted mt-0.5">${c.model}</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0 ml-2">
+                <button class="activate-cred-btn rounded-lg px-2.5 py-1 text-xs font-medium transition ${c.is_active ? 'bg-primary text-primary-foreground' : 'bg-page dark:bg-surface-elevated text-text dark:text-text-dark hover:bg-primary hover:text-primary-foreground'}"
+                    data-id="${c.id}">${c.is_active ? "Active" : "Activate"}</button>
+                <button class="edit-cred-btn rounded-lg p-1 text-text-muted dark:text-text-dark-muted hover:text-primary transition"
+                    data-id="${c.id}"><span class="material-symbols-outlined text-sm">edit</span></button>
+                <button class="delete-cred-btn rounded-lg p-1 text-text-muted dark:text-text-dark-muted hover:text-red-500 transition"
+                    data-id="${c.id}"><span class="material-symbols-outlined text-sm">delete</span></button>
+            </div>
+        `;
+        credentialsContainer.appendChild(div);
+    });
+
+    // Activate buttons
+    document.querySelectorAll(".activate-cred-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const id = parseInt(btn.dataset.id);
+            await fetch("/settings/api/credentials/activate/", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": settingsCsrf },
+                body: JSON.stringify({ credential_id: id }),
+            });
+            loadCredentials();
+        });
+    });
+
+    // Edit buttons
+    document.querySelectorAll(".edit-cred-btn").forEach(btn => {
+        btn.addEventListener("click", () => editCredential(parseInt(btn.dataset.id)));
+    });
+
+    // Delete buttons
+    document.querySelectorAll(".delete-cred-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            if (!confirm("Delete this credential?")) return;
+            await fetch(`/settings/api/credentials/${btn.dataset.id}/`, {
+                method: "DELETE",
+                headers: { "X-CSRFToken": settingsCsrf },
+            });
+            loadCredentials();
+        });
+    });
+}
+
+async function editCredential(id) {
+    try {
+        const resp = await fetch("/settings/api/credentials/", {
+            headers: { "X-CSRFToken": settingsCsrf },
+        });
+        if (!resp.ok) return;
+        const creds = await resp.json();
+        const cred = creds.find(c => c.id === id);
+        if (!cred) return;
+
+        editingCredentialId = id;
+        formTitle.textContent = "Edit Credential";
+        credName.value = cred.name;
+        credProvider.value = cred.provider_type;
+        updateModelDropdown(cred.provider_type);
+        credModel.value = cred.model;
+        credTemp.value = cred.temperature;
+        credMaxTokens.value = cred.max_tokens;
+        if (cred.base_url) credBaseUrl.value = cred.base_url;
+        document.querySelector(`input[name="cred-scope"][value="${cred.scope}"]`).checked = true;
+        credGroup.disabled = cred.scope !== "group";
+        if (cred.scope === "group" && cred.group) credGroup.value = cred.group;
+        credentialForm.classList.remove("hidden");
+    } catch {}
+}
+
+// Load options on LLM tab click
+if (llmTabBtn) {
+    llmTabBtn.addEventListener("click", async () => {
+        const opts = await loadProviderOptions();
+        // Populate group dropdown
+        credGroup.innerHTML = '<option value="">Select group...</option>';
+        (opts.groups || []).forEach(g => {
+            const opt = document.createElement("option");
+            opt.value = g.id;
+            opt.textContent = g.name;
+            credGroup.appendChild(opt);
+        });
+        updateModelDropdown("openai");
+        loadCredentials();
+    });
+}
+
+// Provider change → update models
+credProvider.addEventListener("change", () => updateModelDropdown(credProvider.value));
+
+// Scope radio → toggle group dropdown
+scopeRadios.forEach(radio => {
+    radio.addEventListener("change", () => {
+        credGroup.disabled = radio.value !== "group";
+    });
+});
+
+// New credential button
+newCredBtn.addEventListener("click", () => {
+    editingCredentialId = null;
+    formTitle.textContent = "New Credential";
+    credName.value = "";
+    credProvider.value = "openai";
+    updateModelDropdown("openai");
+    credModel.value = "gpt-4o";
+    credApiKey.value = "";
+    credBaseUrl.value = "";
+    credTemp.value = "0.0";
+    credMaxTokens.value = "4096";
+    document.querySelector('input[name="cred-scope"][value="personal"]').checked = true;
+    credGroup.disabled = true;
+    credentialForm.classList.remove("hidden");
+});
+
+// Cancel form
+formCancel.addEventListener("click", () => {
+    credentialForm.classList.add("hidden");
+    editingCredentialId = null;
+});
+
+// Save credential
+saveBtn.addEventListener("click", async () => {
+    const payload = {
+        name: credName.value,
+        provider_type: credProvider.value,
+        model: credModel.value,
+        api_key: credApiKey.value,
+        temperature: parseFloat(credTemp.value) || 0,
+        max_tokens: parseInt(credMaxTokens.value) || 4096,
+        base_url: credBaseUrl.value,
+        scope: document.querySelector('input[name="cred-scope"]:checked').value,
+    };
+    if (payload.scope === "group" && credGroup.value) {
+        payload.group = parseInt(credGroup.value);
+    }
+
+    const url = editingCredentialId
+        ? `/settings/api/credentials/${editingCredentialId}/`
+        : "/settings/api/credentials/";
+    const method = editingCredentialId ? "PUT" : "POST";
+
+    try {
+        const resp = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json", "X-CSRFToken": settingsCsrf },
+            body: JSON.stringify(payload),
+        });
+        if (resp.ok) {
+            credentialForm.classList.add("hidden");
+            editingCredentialId = null;
+            loadCredentials();
+        } else {
+            const err = await resp.json();
+            alert("Error: " + JSON.stringify(err));
+        }
+    } catch (e) {
+        alert("Error saving credential");
+    }
+});
+</script>
+
+{% endblock %}

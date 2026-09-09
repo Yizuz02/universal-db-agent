@@ -1,0 +1,72 @@
+<div 
+    id="messages-container"
+    class="flex-1 overflow-y-auto px-8 py-8"
+>
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            {% if message.role == "user" %}
+
+                <div class="mb-6 flex justify-end">
+
+                    <div
+                        class="max-w-3xl rounded-2xl bg-primary px-5 py-4 text-primary-foreground">
+
+                        {{ message.content|linebreaksbr }}
+
+                    </div>
+
+                </div>
+
+            {% elif message.role == "agent" and not message.has_tool_calls%}
+
+                <div class="mb-6 flex justify-start">
+
+                    <div
+                        class="max-w-3xl rounded-2xl border border-border dark:border-border-dark
+                               bg-surface dark:bg-surface-elevated
+                               px-5 py-4
+                               text-text dark:text-text-dark">
+
+                        <div class="message-content
+                                prose
+                                dark:prose-invert
+                                max-w-none
+                                prose-p:my-4
+                                prose-headings:mt-6 prose-headings:mb-3
+                                prose-ul:my-4
+                                prose-ol:my-4
+                                prose-li:my-1
+                                prose-pre:my-4">{{message.content}}</div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="flex h-full flex-col items-center justify-center">
+
+            <h1 class="mb-3 text-4xl font-bold text-text dark:text-text-dark">
+                Universal DB Agent
+            </h1>
+
+            <p class="max-w-xl text-center text-text-muted dark:text-text-dark-muted"
+               data-i18n="chat.empty_subtitle">
+
+                Ask questions about your database, generate reports,
+                inspect schemas and obtain insights using natural language.
+
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>

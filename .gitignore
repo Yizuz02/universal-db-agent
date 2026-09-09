@@ -1,0 +1,41 @@
+# --- Environment & secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Databases (runtime / generated) ---
+*.db
+*.sqlite3
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+dist/
+*.local
+
+# --- Generated reports & runtime storage ---
+reports/
+storage/
+backend/exports/
+logs/
+*.log
+
+# --- Internal planning / agent scratch ---
+.superpowers/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+*.swp
+.DS_Store

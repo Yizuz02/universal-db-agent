@@ -1,0 +1,188 @@
+{% extends "chat/base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen flex bg-page dark:bg-page-dark">
+
+    <!-- Left panel -->
+
+    <div class="hidden lg:flex lg:w-1/2 bg-primary justify-center items-center">
+
+        <div class="max-w-md text-primary-foreground">
+
+            <h1 class="text-5xl font-bold mb-6" data-i18n="login.title">
+                Universal DB Agent
+            </h1>
+
+            <p class="text-lg text-primary-subtle leading-relaxed" data-i18n="login.subtitle">
+                Interact with your databases using natural language,
+                generate reports and inspect information through AI.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Right panel -->
+
+    <div class="flex-1 flex items-center justify-center p-8">
+
+        <div class="w-full max-w-md">
+
+            <div class="rounded-2xl shadow-xl p-10
+                        bg-surface
+                        dark:bg-surface-dark">
+
+                <h2 class="text-3xl font-bold
+                           text-text
+                           dark:text-text-dark" data-i18n="login.welcome">
+
+                    Welcome Back
+
+                </h2>
+
+                <p class="mt-2 mb-8
+                          text-text-muted
+                          dark:text-text-dark-muted" data-i18n="login.sign_in_prompt">
+
+                    Sign in to continue.
+
+                </p>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <div class="mb-5">
+
+                        <label class="block mb-2 text-sm font-medium
+                                      text-text
+                                      dark:text-text-dark" data-i18n="login.username">
+
+                            Username
+
+                        </label>
+
+                        <input
+                            type="text"
+                            name="username"
+
+                            class="w-full
+                                   rounded-xl
+                                   border
+                                   border-border
+                                   dark:border-border-dark
+
+                                   bg-surface
+                                   dark:bg-surface-elevated
+
+                                   text-text
+                                   dark:text-text-dark
+
+                                   px-4
+                                   py-3
+
+                                   focus:border-primary
+                                   focus:ring-2
+                                   focus:ring-primary
+
+                                   outline-none">
+
+                    </div>
+
+                    <div class="mb-8">
+
+                        <label class="block mb-2 text-sm font-medium
+                                      text-text
+                                      dark:text-text-dark" data-i18n="login.password">
+
+                            Password
+
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+
+                            class="w-full
+                                   rounded-xl
+                                   border
+                                   border-border
+                                   dark:border-border-dark
+
+                                   bg-surface
+                                   dark:bg-surface-elevated
+
+                                   text-text
+                                   dark:text-text-dark
+
+                                   px-4
+                                   py-3
+
+                                   focus:border-primary
+                                   focus:ring-2
+                                   focus:ring-primary
+
+                                   outline-none">
+
+                    </div>
+
+                    <button
+                        class="w-full
+                               rounded-xl
+                               py-3
+
+                               bg-primary
+                               hover:bg-primary-hover
+
+                               text-primary-foreground
+
+                               font-semibold
+                               transition-colors"
+                        data-i18n="login.sign_in">
+
+                        Sign In
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+// Login-page i18n (reuses the I18N dict from chat.js if available, otherwise defines it)
+if (typeof I18N === "undefined") {
+    window.I18N = {
+        en: { "login.title": "Universal DB Agent", "login.subtitle": "Interact with your databases using natural language, generate reports and inspect information through AI.", "login.welcome": "Welcome Back", "login.sign_in_prompt": "Sign in to continue.", "login.username": "Username", "login.password": "Password", "login.sign_in": "Sign In" },
+        es: { "login.title": "Universal DB Agent", "login.subtitle": "Interactúa con tus bases de datos usando lenguaje natural, genera reportes e inspecciona información a través de IA.", "login.welcome": "Bienvenido", "login.sign_in_prompt": "Inicia sesión para continuar.", "login.username": "Usuario", "login.password": "Contraseña", "login.sign_in": "Iniciar Sesión" },
+        zh: { "login.title": "通用数据库代理", "login.subtitle": "使用自然语言与数据库交互，生成报告并通过AI检查信息。", "login.welcome": "欢迎回来", "login.sign_in_prompt": "登录以继续。", "login.username": "用户名", "login.password": "密码", "login.sign_in": "登录" },
+        pt: { "login.title": "Universal DB Agent", "login.subtitle": "Interaja com seus bancos de dados usando linguagem natural, gere relatórios e inspecione informações através de IA.", "login.welcome": "Bem-vindo de Volta", "login.sign_in_prompt": "Faça login para continuar.", "login.username": "Usuário", "login.password": "Senha", "login.sign_in": "Entrar" },
+    };
+    window.applyLanguage = function(lang) {
+        const dict = (window.I18N[lang] || window.I18N.en);
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.dataset.i18n;
+            if (dict[key] !== undefined) el.textContent = dict[key];
+        });
+        document.documentElement.lang = lang === "zh" ? "zh-CN" : lang === "pt" ? "pt-BR" : lang;
+    };
+}
+document.addEventListener("DOMContentLoaded", () => {
+    try {
+        const prefs = JSON.parse(localStorage.getItem("preferences"));
+        if (prefs && prefs.language && window.applyLanguage) window.applyLanguage(prefs.language);
+    } catch {}
+});
+</script>
+
+{% endblock %}

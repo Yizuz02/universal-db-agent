@@ -1,0 +1,27 @@
+<div class="flex h-16 items-center justify-between border-b border-border dark:border-border-dark px-6">
+
+    <div>
+
+        {% if selected_conversation %}
+
+            <h2 class="text-xl font-semibold text-text dark:text-text-dark">
+                {{ selected_conversation.title }}
+            </h2>
+
+        {% else %}
+
+            <h2 class="text-xl font-semibold text-text dark:text-text-dark" data-i18n="header.new_chat">
+                New Conversation
+            </h2>
+
+        {% endif %}
+
+    </div>
+
+    <div class="text-sm text-text-muted dark:text-text-dark-muted">
+
+        {{ request.user.username }}
+
+    </div>
+
+</div>

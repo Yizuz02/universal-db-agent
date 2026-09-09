@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+/* ============================================================
+   THEME TOKENS
+   ============================================================ */
+
+:root {
+  --font-size: 16px;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+}
+
+:root, [data-theme="light"] {
+  --color-primary: #0891b2; --color-primary-hover: #0e7490; --color-primary-foreground: #ffffff; --color-primary-subtle: #cffafe;
+  --color-page: #f1f5f9; --color-page-dark: #020617;
+  --color-surface: #ffffff; --color-surface-dark: #0f172a; --color-surface-elevated: #1e293b;
+  --color-border: #e2e8f0; --color-border-dark: #334155;
+  --color-text: #0f172a; --color-text-muted: #64748b; --color-text-dark: #f8fafc; --color-text-dark-muted: #94a3b8;
+}
+[data-theme="dark"] {
+  --color-primary: #22d3ee; --color-primary-hover: #06b6d4; --color-primary-foreground: #020617; --color-primary-subtle: #083344;
+  --color-page: #0f172a; --color-page-dark: #020617;
+  --color-surface: #1e293b; --color-surface-dark: #0f172a; --color-surface-elevated: #334155;
+  --color-border: #334155; --color-border-dark: #1e293b;
+  --color-text: #f8fafc; --color-text-muted: #94a3b8; --color-text-dark: #e2e8f0; --color-text-dark-muted: #64748b;
+}
+[data-theme="ocean"] {
+  --color-primary: #2563eb; --color-primary-hover: #1d4ed8; --color-primary-foreground: #ffffff; --color-primary-subtle: #dbeafe;
+  --color-page: #eff6ff; --color-page-dark: #0a1628;
+  --color-surface: #ffffff; --color-surface-dark: #0f1a2e; --color-surface-elevated: #1a2d4a;
+  --color-border: #bfdbfe; --color-border-dark: #1e3a5f;
+  --color-text: #172554; --color-text-muted: #64748b; --color-text-dark: #e0f2fe; --color-text-dark-muted: #7ca2c2;
+}
+[data-theme="matrix"] {
+  --color-primary: #00ff41; --color-primary-hover: #00cc33; --color-primary-foreground: #000000; --color-primary-subtle: #003d0d;
+  --color-page: #0d1117; --color-page-dark: #000000;
+  --color-surface: #161b22; --color-surface-dark: #0a0a0a; --color-surface-elevated: #1c2128;
+  --color-border: #00ff4144; --color-border-dark: #00ff4122;
+  --color-text: #00ff41; --color-text-muted: #00cc3377; --color-text-dark: #33ff77; --color-text-dark-muted: #00aa3377;
+}
+[data-theme="sunset"] {
+  --color-primary: #f97316; --color-primary-hover: #ea580c; --color-primary-foreground: #ffffff; --color-primary-subtle: #ffedd5;
+  --color-page: #fffbeb; --color-page-dark: #1c1512;
+  --color-surface: #ffffff; --color-surface-dark: #2a1f1a; --color-surface-elevated: #3d2d25;
+  --color-border: #fed7aa; --color-border-dark: #5c4033;
+  --color-text: #431407; --color-text-muted: #a16207; --color-text-dark: #fef3c7; --color-text-dark-muted: #d48a55;
+}
+[data-theme="blush"] {
+  --color-primary: #e11d48; --color-primary-hover: #be123c; --color-primary-foreground: #ffffff; --color-primary-subtle: #ffe4e6;
+  --color-page: #fff1f2; --color-page-dark: #1f1117;
+  --color-surface: #ffffff; --color-surface-dark: #2d161f; --color-surface-elevated: #3d1e2a;
+  --color-border: #fecdd3; --color-border-dark: #5c2a3a;
+  --color-text: #4c0519; --color-text-muted: #9f1239; --color-text-dark: #ffe4e6; --color-text-dark-muted: #d46a82;
+}
+[data-theme="synthwave"] {
+  --color-primary: #7aa2f7; --color-primary-hover: #5d8fe8; --color-primary-foreground: #1a1b2e; --color-primary-subtle: #2a2b4e;
+  --color-page: #1a1b2e; --color-page-dark: #0f0f1a;
+  --color-surface: #24263b; --color-surface-dark: #16161e; --color-surface-elevated: #2f3148;
+  --color-border: #3b3d5c; --color-border-dark: #2a2a3e;
+  --color-text: #c0caf5; --color-text-muted: #7c7fa0; --color-text-dark: #a9b1d6; --color-text-dark-muted: #56587a;
+}
+[data-theme="graphite"] {
+  --color-primary: #78716c; --color-primary-hover: #57534e; --color-primary-foreground: #ffffff; --color-primary-subtle: #f5f5f4;
+  --color-page: #f5f5f4; --color-page-dark: #1c1917;
+  --color-surface: #ffffff; --color-surface-dark: #292524; --color-surface-elevated: #44403c;
+  --color-border: #d6d3d1; --color-border-dark: #44403c;
+  --color-text: #1c1917; --color-text-muted: #78716c; --color-text-dark: #f5f5f4; --color-text-dark-muted: #a8a29e;
+}
+
+/* Font families */
+[data-font-family="system"] { --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif; }
+[data-font-family="serif"]  { --font-family: Georgia, "Times New Roman", serif; }
+[data-font-family="mono"]   { --font-family: "JetBrains Mono", "Fira Code", "Consolas", "Courier New", monospace; }
+[data-font-family="rounded"] { --font-family: "Nunito", "Quicksand", system-ui, sans-serif; }
+
+body {
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+}
+
+/* Active button state */
+.btn-active {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-foreground) !important;
+  border-color: var(--color-primary) !important;
+}
+.btn-inactive {
+  background-color: var(--color-page);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.dark .btn-inactive {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text-dark);
+  border-color: var(--color-border-dark);
+}
+
+/* Matrix theme mono font */
+[data-theme="matrix"] body,
+[data-theme="matrix"] textarea,
+[data-theme="matrix"] input {
+  font-family: 'Courier New', 'Consolas', 'Monaco', monospace !important;
+}
+
+/* ============================================================
+   BUTTONS: POINTER CURSOR + HOVER EFFECTS
+   ============================================================ */
+
+/* Mouse icon changes to a hand pointer over every enabled button */
+button:not(:disabled) {
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Universal hover/active feedback (brightness filter is safe on every theme) */
+button:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+button:not(:disabled):active {
+  filter: brightness(0.94);
+  transform: scale(0.98);
+}
+
+/* Primary filled buttons — use the theme's dedicated hover color */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  filter: none;
+}
+
+/* Active/selected buttons (theme pickers, tabs, chips) */
+.btn-active:hover:not(:disabled) {
+  background-color: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+}
+
+/* Inactive selectable buttons — soft theme-tinted highlight */
+.btn-inactive:hover:not(:disabled) {
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ============================================================
+   MARKDOWN RENDERING (chat bubbles)
+   ============================================================ */
+.md > *:first-child { margin-top: 0; }
+.md > *:last-child { margin-bottom: 0; }
+.md p { margin: 0.4em 0; }
+.md h1, .md h2, .md h3, .md h4 { font-weight: 700; line-height: 1.3; margin: 0.8em 0 0.4em; }
+.md h1 { font-size: 1.25em; } .md h2 { font-size: 1.15em; }
+.md h3 { font-size: 1.05em; } .md h4 { font-size: 1em; }
+.md ul, .md ol { margin: 0.4em 0; padding-left: 1.5em; }
+.md ul { list-style: disc; } .md ol { list-style: decimal; }
+.md li + li { margin-top: 0.2em; }
+.md li > ul, .md li > ol { margin: 0.2em 0; }
+.md code { font-family: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace; font-size: 0.9em; }
+.md :not(pre) > code {
+  background-color: var(--color-page);
+  padding: 0.15em 0.4em;
+  border-radius: 0.375rem;
+}
+.md pre {
+  margin: 0.6em 0;
+  padding: 0.75em 1em;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background-color: var(--color-page);
+  font-size: 0.85em;
+  line-height: 1.5;
+}
+.md pre code { background: none; padding: 0; }
+.md table { width: 100%; margin: 0.6em 0; border-collapse: collapse; font-size: 0.9em; }
+.md th, .md td { border: 1px solid var(--color-border); padding: 0.4em 0.75em; text-align: left; }
+.md th { background-color: var(--color-page); font-weight: 600; }
+.md blockquote {
+  margin: 0.6em 0;
+  padding: 0.1em 1em;
+  border-left: 3px solid var(--color-primary);
+  color: var(--color-text-muted);
+}
+.md a { color: var(--color-primary); text-decoration: underline; }
+.md hr { margin: 0.8em 0; border: none; border-top: 1px solid var(--color-border); }
+
+/* Markdown inside the user bubble (solid primary background): use
+   translucent white instead of light theme surfaces for contrast. */
+.md-on-primary :not(pre) > code,
+.md-on-primary th,
+.md-on-primary pre { background-color: rgba(255, 255, 255, 0.15); }
+.md-on-primary pre { border-color: rgba(255, 255, 255, 0.3); }
+.md-on-primary th, .md-on-primary td { border-color: rgba(255, 255, 255, 0.3); }
+.md-on-primary blockquote { border-left-color: rgba(255, 255, 255, 0.6); color: inherit; opacity: 0.95; }
+.md-on-primary a { color: inherit; text-decoration: underline; }

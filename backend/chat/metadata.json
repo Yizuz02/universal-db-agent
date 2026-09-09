@@ -1,0 +1,23 @@
+{
+  "database_description": "Construction company management system tracking projects, workers, and resource assignments.",
+  "tables": {
+    "projects": {
+      "description": "Stores core information about building contracts.",
+      "column_annotations": {
+        "status": "Can only be 'Planning', 'In Planning', or 'Completed'."
+      }
+    },
+    "workers": {
+      "description": "Contains payroll and role data for contractors and employees.",
+      "column_annotations": {
+        "role": "Defines specialization: 'Engineer', 'Architect', 'Mason', 'Electrician'."
+      }
+    },
+    "assignments": {
+      "description": "Links workers to projects and defines their roles within those projects.",
+      "column_annotations": {
+        "role": "The specific role a worker has in a given project assignment (e.g., 'Lead Engineer', 'Support Architect')."
+      }
+    }
+  }
+}

@@ -1,0 +1,193 @@
+<div
+    id="sidebar"
+    class="flex h-full w-80 shrink-16 flex-col
+           overflow-hidden
+           border-r border-border dark:border-border-dark
+           bg-surface dark:bg-surface-dark
+
+           transition-all
+           duration-300
+           ease-in-out">
+
+    <!-- Header -->
+
+    <div class="flex h-16 items-center justify-between px-5">
+
+        <h1
+            id="sidebar-title"
+            class="text-xl font-bold text-text dark:text-text-dark"
+            data-i18n="sidebar.app_title">
+
+            Universal DB Agent
+
+        </h1>
+
+        <button
+            id="sidebar-toggle"
+            class="rounded-lg p-2 transition
+                   hover:bg-page dark:hover:bg-surface-elevated">
+
+            <span class="material-symbols-outlined">
+                menu
+            </span>
+
+        </button>
+
+    </div>
+
+    <div 
+        id="sidebar-body" 
+        class="flex flex-1 flex-col
+           transition-opacity
+           duration-150">
+
+        <!-- New Chat -->
+
+        <div class="px-5 pb-4">
+
+            <button
+                class="w-full rounded-xl
+                    bg-primary
+                    hover:bg-primary-hover
+                    py-3
+                    font-medium
+                    text-primary-foreground
+                    transition"
+                data-i18n="sidebar.new_conversation">
+
+                + New Conversation
+
+            </button>
+
+        </div>
+
+        <!-- Search -->
+
+        <div class="px-5 pb-5">
+
+            <input
+                type="text"
+                placeholder="Search conversations..."
+                data-i18n="sidebar.search"
+
+                class="w-full rounded-xl
+                    border border-border dark:border-border-dark
+
+                    bg-page dark:bg-surface-elevated
+
+                    px-4 py-3
+
+                    text-text dark:text-text-dark
+                    placeholder:text-text-muted
+                    dark:placeholder:text-text-dark-muted
+
+                    outline-none
+
+                    focus:border-primary
+                    focus:ring-2
+                    focus:ring-primary">
+
+        </div>
+
+        <!-- Conversation List -->
+
+        <div class="flex-1 overflow-y-auto px-2">
+
+            {% include "chat/components/conversation_list.html" %}
+
+        </div>
+
+        <!-- Footer -->
+
+        <div
+            class="border-t
+                border-border
+                dark:border-border-dark
+
+                p-3">
+
+            <button
+                id="settings-button"
+                type="button"
+                class="mb-2 flex w-full items-center rounded-xl px-4 py-3
+                    transition
+                    hover:bg-page
+                    dark:hover:bg-surface-elevated
+                    text-text dark:text-text-dark">
+
+                <span class="material-symbols-outlined">
+                    settings
+                </span>
+
+                <span class="ml-3" data-i18n="sidebar.settings">
+                    Settings
+                </span>
+
+            </button>
+
+            <button
+                class="flex w-full items-center rounded-xl px-4 py-3
+                    transition
+                    hover:bg-page
+                    dark:hover:bg-surface-elevated">
+
+                <span class="material-symbols-outlined">
+                    account_circle
+                </span>
+
+                <span class="ml-3">
+                    {{ request.user.username }}
+                </span>
+
+            </button>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+const sidebar = document.getElementById("sidebar");
+const body = document.getElementById("sidebar-body");
+const title = document.getElementById("sidebar-title");
+
+const toggle = document.getElementById("sidebar-toggle");
+
+let expanded = true;
+
+toggle.addEventListener("click", () => {
+
+    expanded = !expanded;
+
+    if (expanded) {
+
+        sidebar.classList.remove("w-16");
+        sidebar.classList.add("w-80");
+
+        body.classList.remove("hidden");
+
+        requestAnimationFrame(() => {
+            body.classList.remove("opacity-0");
+            title.classList.remove("hidden");
+        });
+
+    }
+
+    else {
+
+        body.classList.add("opacity-0");
+        title.classList.add("hidden");
+
+        setTimeout(() => {
+
+            body.classList.add("hidden");
+
+        }, 200);
+
+        sidebar.classList.remove("w-80");
+        sidebar.classList.add("w-16");
+
+    }
+
+});
+</script>

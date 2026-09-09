@@ -1,0 +1,50 @@
+<div class="border-t border-border dark:border-border-dark p-6">
+
+    <form id="chat-form">
+
+        {% csrf_token %}
+
+        <div
+            class="flex items-end rounded-2xl
+                   border border-border dark:border-border-dark
+                   bg-surface dark:bg-surface-dark
+                   p-3">
+
+            <textarea
+                id="chat-input"
+                rows="1"
+                placeholder="Ask anything about your database..."
+                data-i18n="chat_input.placeholder"
+                class="flex-1 resize-none overflow-y-auto
+                       bg-transparent
+                       py-2
+                       leading-6
+
+                       text-text dark:text-text-dark
+                       placeholder:text-text-muted
+                       dark:placeholder:text-text-dark-muted
+
+                       outline-none"></textarea>
+
+            <button
+                id="send-button"
+                type="submit"
+                class="ml-4 flex h-11 w-11 shrink-0
+                       items-center justify-center
+                       rounded-full
+                       bg-primary
+                       text-primary-foreground
+                       transition-colors
+                       hover:bg-primary-hover">
+
+                <span class="material-symbols-outlined">
+                    arrow_upward
+                </span>
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

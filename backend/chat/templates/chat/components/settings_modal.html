@@ -1,0 +1,354 @@
+<div
+    id="settings-modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center
+           bg-black/50 backdrop-blur-sm">
+
+    <div
+        class="mx-4 flex h-[85vh] w-full max-w-3xl flex-col rounded-2xl
+               border border-border dark:border-border-dark
+               bg-surface dark:bg-surface-dark
+               shadow-2xl">
+
+        <!-- Header -->
+        <div class="flex shrink-0 items-center justify-between border-b border-border dark:border-border-dark px-6 py-4">
+            <h2 class="text-xl font-semibold text-text dark:text-text-dark" data-i18n="settings.title">Settings</h2>
+            <button
+                id="settings-close"
+                class="rounded-lg p-2 transition
+                       hover:bg-page dark:hover:bg-surface-elevated
+                       text-text-muted dark:text-text-dark-muted">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- Body: sidebar + content -->
+        <div class="flex flex-1 overflow-hidden">
+
+            <!-- Sidebar tabs (General first) -->
+            <nav class="flex w-48 shrink-0 flex-col gap-1 border-r border-border dark:border-border-dark p-3">
+                <button data-tab="general"
+                    class="settings-tab flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition
+                           bg-primary text-primary-foreground">
+                    <span class="material-symbols-outlined text-lg">settings</span>
+                    <span data-i18n="tab.general">General</span>
+                </button>
+                <button data-tab="appearance"
+                    class="settings-tab flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition
+                           bg-page dark:bg-surface-elevated text-text dark:text-text-dark hover:bg-page dark:hover:bg-surface-elevated">
+                    <span class="material-symbols-outlined text-lg">palette</span>
+                    <span data-i18n="tab.appearance">Apariencia</span>
+                </button>
+                <button data-tab="llm"
+                    class="settings-tab flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition
+                           bg-page dark:bg-surface-elevated text-text dark:text-text-dark hover:bg-page dark:hover:bg-surface-elevated">
+                    <span class="material-symbols-outlined text-lg">psychology</span>
+                    <span data-i18n="tab.llm">LLM</span>
+                </button>
+                <button data-tab="database"
+                    class="settings-tab flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition
+                           bg-page dark:bg-surface-elevated text-text dark:text-text-dark hover:bg-page dark:hover:bg-surface-elevated">
+                    <span class="material-symbols-outlined text-lg">storage</span>
+                    <span data-i18n="tab.database">Base de Datos</span>
+                </button>
+            </nav>
+
+            <!-- Content panels -->
+            <div class="flex-1 overflow-y-auto p-6">
+
+                <!-- ===== GENERAL (first) ===== -->
+                <div id="panel-general" class="settings-panel">
+                    <h3 class="mb-5 text-lg font-semibold text-text dark:text-text-dark" data-i18n="general.heading">General</h3>
+
+                    <!-- Language -->
+                    <div class="mb-6">
+                        <label class="mb-3 block text-sm font-medium text-text dark:text-text-dark" data-i18n="general.language_label">Language</label>
+                        <div class="grid grid-cols-2 gap-2" id="language-options">
+                            <button data-lang="en"
+                                class="lang-btn flex-1 rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">
+                                🇬🇧 English
+                            </button>
+                            <button data-lang="es"
+                                class="lang-btn flex-1 rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">
+                                🇲🇽 Español
+                            </button>
+                            <button data-lang="zh"
+                                class="lang-btn flex-1 rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">
+                                🇨🇳 中文
+                            </button>
+                            <button data-lang="pt"
+                                class="lang-btn flex-1 rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">
+                                🇧🇷 Português
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timezone -->
+                    <div>
+                        <label class="mb-3 block text-sm font-medium text-text dark:text-text-dark" data-i18n="general.timezone">Timezone</label>
+                        <select id="timezone-select"
+                            class="w-full rounded-xl border border-border dark:border-border-dark
+                                   bg-page dark:bg-surface-elevated
+                                   px-4 py-3 text-sm
+                                   text-text dark:text-text-dark
+                                   outline-none focus:border-primary focus:ring-2 focus:ring-primary">
+                            <option value="America/Mexico_City">🇲🇽 CDMX (UTC-6)</option>
+                            <option value="America/New_York">🇺🇸 New York (UTC-5)</option>
+                            <option value="America/Chicago">🇺🇸 Chicago (UTC-6)</option>
+                            <option value="America/Denver">🇺🇸 Denver (UTC-7)</option>
+                            <option value="America/Los_Angeles">🇺🇸 Los Angeles (UTC-8)</option>
+                            <option value="America/Argentina/Buenos_Aires">🇦🇷 Buenos Aires (UTC-3)</option>
+                            <option value="America/Sao_Paulo">🇧🇷 São Paulo (UTC-3)</option>
+                            <option value="Europe/Madrid">🇪🇸 Madrid (UTC+1)</option>
+                            <option value="Europe/London">🇬🇧 London (UTC+0)</option>
+                            <option value="Europe/Berlin">🇩🇪 Berlin (UTC+1)</option>
+                            <option value="Asia/Tokyo">🇯🇵 Tokyo (UTC+9)</option>
+                            <option value="Asia/Shanghai">🇨🇳 Shanghai (UTC+8)</option>
+                            <option value="Asia/Kolkata">🇮🇳 India (UTC+5:30)</option>
+                            <option value="Australia/Sydney">🇦🇺 Sydney (UTC+10)</option>
+                            <option value="Pacific/Auckland">🇳🇿 Auckland (UTC+12)</option>
+                            <option value="UTC">🌐 UTC</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ===== APARIENCIA ===== -->
+                <div id="panel-appearance" class="settings-panel hidden">
+                    <h3 class="mb-5 text-lg font-semibold text-text dark:text-text-dark" data-i18n="appearance.heading">Apariencia</h3>
+
+                    <!-- Theme -->
+                    <div class="mb-6">
+                        <label class="mb-3 block text-sm font-medium text-text dark:text-text-dark" data-i18n="appearance.theme">Theme</label>
+                        <div class="grid grid-cols-4 gap-2" id="theme-options">
+                            <button data-theme="light"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #f1f5f9 40%, #0891b2 100%);"></span>
+                                <span>Light</span>
+                            </button>
+                            <button data-theme="dark"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #0f172a 40%, #22d3ee 100%);"></span>
+                                <span>Dark</span>
+                            </button>
+                            <button data-theme="ocean"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #eff6ff 40%, #2563eb 100%);"></span>
+                                <span>Ocean</span>
+                            </button>
+                            <button data-theme="matrix"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #0d1117 40%, #00ff41 100%);"></span>
+                                <span>Matrix</span>
+                            </button>
+                            <button data-theme="sunset"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #fffbeb 40%, #f97316 100%);"></span>
+                                <span>Sunset</span>
+                            </button>
+                            <button data-theme="blush"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #fff1f2 40%, #e11d48 100%);"></span>
+                                <span>Blush</span>
+                            </button>
+                            <button data-theme="synthwave"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #1a1b2e 40%, #bb9af7 100%);"></span>
+                                <span>Synthwave</span>
+                            </button>
+                            <button data-theme="graphite"
+                                class="theme-btn flex flex-col items-center gap-1 rounded-lg border border-border dark:border-border-dark px-2 py-3 text-xs font-medium transition">
+                                <span class="mb-0.5 flex h-6 w-full max-w-[40px] rounded-sm" style="background: linear-gradient(135deg, #f5f5f4 40%, #78716c 100%);"></span>
+                                <span>Graphite</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Font size -->
+                    <div class="mb-6">
+                        <label class="mb-3 block text-sm font-medium text-text dark:text-text-dark" data-i18n="appearance.font_size">Font Size</label>
+                        <div class="flex gap-2" id="font-size-options">
+                            <button data-size="12px"
+                                class="size-btn flex-1 rounded-xl border border-border dark:border-border-dark px-3 py-2.5 text-xs font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">12px</button>
+                            <button data-size="14px"
+                                class="size-btn flex-1 rounded-xl border border-border dark:border-border-dark px-3 py-2.5 text-sm font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">14px</button>
+                            <button data-size="16px"
+                                class="size-btn flex-1 rounded-xl border border-border dark:border-border-dark px-3 py-2.5 text-base font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">16px</button>
+                            <button data-size="18px"
+                                class="size-btn flex-1 rounded-xl border border-border dark:border-border-dark px-3 py-2.5 text-lg font-medium transition
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark">18px</button>
+                        </div>
+                    </div>
+
+                    <!-- Font family -->
+                    <div class="mb-2">
+                        <label class="mb-3 block text-sm font-medium text-text dark:text-text-dark" data-i18n="appearance.font_family">Font Family</label>
+                        <div class="grid grid-cols-2 gap-2" id="font-family-options">
+                            <button data-family="system"
+                                class="family-btn rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition text-left
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark"
+                                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif">System UI</button>
+                            <button data-family="serif"
+                                class="family-btn rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition text-left
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark"
+                                style="font-family: Georgia, 'Times New Roman', serif">Serif</button>
+                            <button data-family="mono"
+                                class="family-btn rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition text-left
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark"
+                                style="font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace">Monospace</button>
+                            <button data-family="rounded"
+                                class="family-btn rounded-xl border border-border dark:border-border-dark px-4 py-3 text-sm font-medium transition text-left
+                                       bg-page dark:bg-surface-elevated text-text dark:text-text-dark"
+                                style="font-family: Nunito, Quicksand, system-ui, sans-serif">Rounded</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== LLM ===== -->
+                <div id="panel-llm" class="settings-panel hidden">
+                    <h3 class="mb-5 text-lg font-semibold text-text dark:text-text-dark" data-i18n="llm.heading">LLM</h3>
+
+                    <!-- Saved credentials list -->
+                    <div class="mb-6" id="credential-list">
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-medium text-text dark:text-text-dark">Saved Credentials</label>
+                            <button id="new-credential-btn" type="button"
+                                class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:bg-primary-hover">
+                                + New
+                            </button>
+                        </div>
+                        <div id="credentials-container" class="space-y-2">
+                            <p class="text-xs text-text-muted dark:text-text-dark-muted text-center py-4">No credentials saved yet.</p>
+                        </div>
+                    </div>
+
+                    <!-- Credential form (hidden by default) -->
+                    <div id="credential-form" class="hidden space-y-4 rounded-xl border border-border dark:border-border-dark p-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-semibold text-text dark:text-text-dark" id="credential-form-title">New Credential</h4>
+                            <button id="credential-form-cancel" type="button" class="text-xs text-text-muted dark:text-text-dark-muted hover:text-primary">Cancel</button>
+                        </div>
+
+                        <!-- Name -->
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Name</label>
+                            <input type="text" id="cred-name" placeholder="My OpenAI key"
+                                class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                        </div>
+
+                        <!-- Provider -->
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Provider</label>
+                            <select id="cred-provider"
+                                class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                                <option value="openai">OpenAI</option>
+                                <option value="anthropic">Anthropic</option>
+                                <option value="google">Google Gemini</option>
+                                <option value="ollama">Ollama</option>
+                                <option value="xai">Grok (xAI)</option>
+                            </select>
+                        </div>
+
+                        <!-- Model -->
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Model</label>
+                            <select id="cred-model"
+                                class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                            </select>
+                        </div>
+
+                        <!-- API Key (hidden for Ollama) -->
+                        <div id="cred-api-key-group">
+                            <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">API Key</label>
+                            <input type="password" id="cred-api-key" placeholder="sk-..."
+                                class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                        </div>
+
+                        <!-- Base URL (shown only for ollama) -->
+                        <div id="cred-base-url-group" class="hidden">
+                            <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Base URL</label>
+                            <input type="text" id="cred-base-url" placeholder="http://localhost:11434"
+                                class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                        </div>
+
+                        <!-- Advanced settings collapsible -->
+                        <details class="group">
+                            <summary class="cursor-pointer list-none text-xs font-medium text-text-muted dark:text-text-dark-muted hover:text-text dark:hover:text-text-dark transition">
+                                <span class="inline-flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm transition group-open:rotate-90">chevron_right</span>
+                                    Advanced Settings
+                                </span>
+                            </summary>
+                            <div class="mt-3 grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Temperature</label>
+                                    <input type="number" step="0.1" min="0" max="2" id="cred-temp" value="0.0"
+                                        class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Max Tokens</label>
+                                    <input type="number" min="1" id="cred-max-tokens" value="4096"
+                                        class="w-full rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-3 py-2 text-sm text-text dark:text-text-dark outline-none focus:border-primary">
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Scope toggle -->
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-text dark:text-text-dark">Scope</label>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="cred-scope" value="personal" checked
+                                        class="text-primary focus:ring-primary">
+                                    <span class="text-xs text-text dark:text-text-dark">🔒 Personal</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="radio" name="cred-scope" value="group"
+                                        class="text-primary focus:ring-primary">
+                                    <span class="text-xs text-text dark:text-text-dark">👥 Group</span>
+                                </label>
+                                <select id="cred-group" disabled
+                                    class="flex-1 rounded-lg border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-2 py-1.5 text-xs text-text dark:text-text-dark outline-none">
+                                    <option value="">Select group...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button id="credential-save-btn" type="button"
+                            class="w-full rounded-lg bg-primary py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover">
+                            Save Credential
+                        </button>
+                    </div>
+
+                    <p class="mt-4 text-xs text-text-muted dark:text-text-dark-muted text-center" data-i18n="llm.coming_soon">More LLM settings coming soon.</p>
+                </div>
+
+                <!-- ===== BASE DE DATOS ===== -->
+                <div id="panel-database" class="settings-panel hidden">
+                    <h3 class="mb-5 text-lg font-semibold text-text dark:text-text-dark" data-i18n="db.heading">Database</h3>
+                    <div class="space-y-4 opacity-40 pointer-events-none select-none">
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-text dark:text-text-dark" data-i18n="db.path">Database Path</label>
+                            <div class="rounded-xl border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-4 py-3 text-sm text-text-muted dark:text-text-dark-muted font-mono">storage/databases/construction_company.db</div>
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-text dark:text-text-dark" data-i18n="db.status">Status</label>
+                            <div class="flex items-center gap-2 rounded-xl border border-border dark:border-border-dark bg-page dark:bg-surface-elevated px-4 py-3 text-sm">
+                                <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                                <span class="text-text-muted dark:text-text-dark-muted" data-i18n="db.connected">Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-xs text-text-muted dark:text-text-dark-muted text-center" data-i18n="db.coming_soon">Coming soon.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
